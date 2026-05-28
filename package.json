@@ -1,0 +1,22 @@
+{
+  "name": "expo-nest-starter",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Simple starter with an Expo mobile app and NestJS backend.",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:mobile\" \"npm run dev:api\"",
+    "dev:mobile": "npm run start -w mobile",
+    "dev:api": "npm run start:dev -w api",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "prettier": "^3.3.3",
+    "typescript": "^5.6.3"
+  }
+}
