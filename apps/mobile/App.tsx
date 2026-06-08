@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { setAudioModeAsync, useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 import { StatusBar } from "expo-status-bar";
@@ -22,6 +23,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "./src/components/Card"
 import Input from "./src/components/Input";
 
 const DICTIONARY_API_URL = "https://api.dictionaryapi.dev/api/v2/entries/en";
+const SEARCH_HISTORY_STORAGE_KEY = "dictionary-search-history";
 
 type DictionaryPhonetic = {
   text?: string;
@@ -122,6 +124,14 @@ function getAudioOptions(phonetics: DictionaryPhonetic[]) {
   return [...options.values()];
 }
 
+function sanitizeSearchTerm(value: string) {
+  return value.trim().replace(/\s+/g, "");
+}
+
+function isValidSearchTerm(value: string) {
+  return /^[a-zA-Z'-]+$/.test(value);
+}
+
 export default function App() {
   return (
     <SafeAreaProvider>
@@ -140,6 +150,7 @@ function DictionaryApp() {
   const [entries, setEntries] = useState<DictionaryEntry[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [history, setHistory] = useState<string[]>([]);
+  const [hasLoadedHistory, setHasLoadedHistory] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedAudioIndex, setSelectedAudioIndex] = useState(0);
   const [playbackMessage, setPlaybackMessage] = useState("");
@@ -175,6 +186,31 @@ function DictionaryApp() {
   }, [selectedAudioUrl]);
 
   useEffect(() => {
+    AsyncStorage.getItem(SEARCH_HISTORY_STORAGE_KEY)
+      .then((storedHistory) => {
+        if (!storedHistory) {
+          return;
+        }
+
+        const parsedHistory = JSON.parse(storedHistory);
+
+        if (Array.isArray(parsedHistory)) {
+          setHistory(parsedHistory.filter((word): word is string => typeof word === "string").slice(0, 12));
+        }
+      })
+      .catch(() => undefined)
+      .finally(() => setHasLoadedHistory(true));
+  }, []);
+
+  useEffect(() => {
+    if (!hasLoadedHistory) {
+      return;
+    }
+
+    AsyncStorage.setItem(SEARCH_HISTORY_STORAGE_KEY, JSON.stringify(history)).catch(() => undefined);
+  }, [hasLoadedHistory, history]);
+
+  useEffect(() => {
     // Reset tap count after 1 second
     if (titleTapCount > 0) {
       const timer = setTimeout(() => setTitleTapCount(0), 1000);
@@ -194,7 +230,7 @@ function DictionaryApp() {
   }
 
   async function searchWord(wordToSearch = searchTerm) {
-    const cleanedWord = wordToSearch.trim();
+    const cleanedWord = sanitizeSearchTerm(wordToSearch);
 
     if (!cleanedWord) {
       setInputError("Enter an English word to search.");
@@ -202,7 +238,14 @@ function DictionaryApp() {
       return;
     }
 
+    if (!isValidSearchTerm(cleanedWord)) {
+      setInputError("Use letters only. Apostrophes and hyphens are allowed.");
+      setErrorMessage("");
+      return;
+    }
+
     Keyboard.dismiss();
+    setSearchTerm(cleanedWord);
     setInputError("");
     setErrorMessage("");
     setPlaybackMessage("");
