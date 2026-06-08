@@ -119,12 +119,6 @@ function getAudioOptions(phonetics: DictionaryPhonetic[]) {
   return [...options.values()];
 }
 
-function getPlainJsonPreview(value: unknown) {
-  return JSON.stringify(value, null, 2)
-    .replace(/"([^"]+)":/g, "$1:")
-    .replace(/"/g, "");
-}
-
 export default function App() {
   const [searchTerm, setSearchTerm] = useState("");
   const [inputError, setInputError] = useState("");
@@ -135,7 +129,6 @@ export default function App() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedAudioIndex, setSelectedAudioIndex] = useState(0);
   const [playbackMessage, setPlaybackMessage] = useState("");
-  const [showSourceData, setShowSourceData] = useState(false);
 
   const entry = entries[0];
   const allPhonetics = useMemo(() => entries.flatMap((wordEntry) => wordEntry.phonetics ?? []), [entries]);
@@ -150,16 +143,6 @@ export default function App() {
   const selectedAudioUrl = audioOptions[selectedAudioIndex]?.url ?? null;
   const audioPlayer = useAudioPlayer(selectedAudioUrl, { updateInterval: 250 });
   const audioStatus = useAudioPlayerStatus(audioPlayer);
-  const phoneticsPreview = useMemo(
-    () =>
-      getPlainJsonPreview(
-        allPhonetics.map((phonetic) => ({
-          text: phonetic.text || null,
-          audio: normalizeAudioUrl(phonetic.audio ?? "") || null
-        }))
-      ),
-    [allPhonetics]
-  );
 
   useEffect(() => {
     setAudioModeAsync({
@@ -186,7 +169,6 @@ export default function App() {
     setInputError("");
     setErrorMessage("");
     setPlaybackMessage("");
-    setShowSourceData(false);
     setIsLoading(true);
     setSelectedAudioIndex(0);
 
@@ -261,6 +243,16 @@ export default function App() {
     await audioPlayer.seekTo(0).catch(() => undefined);
   }
 
+  function removeHistoryWord(wordToRemove: string) {
+    setHistory((currentHistory) =>
+      currentHistory.filter((historyWord) => historyWord.toLowerCase() !== wordToRemove.toLowerCase())
+    );
+  }
+
+  function clearHistory() {
+    setHistory([]);
+  }
+
   function renderEmptyState() {
     if (isLoading) {
       return (
@@ -319,22 +311,36 @@ export default function App() {
             </View>
 
             {history.length ? (
-              <ScrollView contentContainerStyle={styles.historyList}>
-                {history.map((historyWord) => (
-                  <Pressable
-                    accessibilityRole="button"
-                    key={historyWord.toLowerCase()}
-                    style={styles.historyItem}
-                    onPress={() => {
-                      setIsDrawerOpen(false);
-                      searchWord(historyWord);
-                    }}
-                  >
-                    <Ionicons name="time-outline" size={19} color="#0f766e" />
-                    <Text style={styles.historyWord}>{historyWord}</Text>
-                  </Pressable>
-                ))}
-              </ScrollView>
+              <>
+                <Pressable accessibilityRole="button" style={styles.clearHistoryButton} onPress={clearHistory}>
+                  <Ionicons name="trash-outline" size={17} color="#b91c1c" />
+                  <Text style={styles.clearHistoryText}>Clear all history</Text>
+                </Pressable>
+                <ScrollView contentContainerStyle={styles.historyList}>
+                  {history.map((historyWord) => (
+                    <View key={historyWord.toLowerCase()} style={styles.historyItem}>
+                      <Pressable
+                        accessibilityRole="button"
+                        style={styles.historyWordButton}
+                        onPress={() => {
+                          setIsDrawerOpen(false);
+                          searchWord(historyWord);
+                        }}
+                      >
+                        <Ionicons name="time-outline" size={19} color="#0f766e" />
+                        <Text style={styles.historyWord}>{historyWord}</Text>
+                      </Pressable>
+                      <Pressable
+                        accessibilityRole="button"
+                        style={styles.deleteHistoryButton}
+                        onPress={() => removeHistoryWord(historyWord)}
+                      >
+                        <Ionicons name="close" size={18} color="#b91c1c" />
+                      </Pressable>
+                    </View>
+                  ))}
+                </ScrollView>
+              </>
             ) : (
               <View style={styles.drawerEmpty}>
                 <Text style={styles.mutedText}>Your successful searches will appear here.</Text>
@@ -405,20 +411,6 @@ export default function App() {
                 </Pressable>
               ) : null}
             </View>
-            {history.length ? (
-              <View style={styles.recentSearches}>
-                {history.slice(0, 4).map((historyWord) => (
-                  <Pressable
-                    accessibilityRole="button"
-                    key={historyWord.toLowerCase()}
-                    style={styles.recentChip}
-                    onPress={() => searchWord(historyWord)}
-                  >
-                    <Text style={styles.recentChipText}>{historyWord}</Text>
-                  </Pressable>
-                ))}
-              </View>
-            ) : null}
           </CardContent>
         </Card>
 
@@ -500,25 +492,6 @@ export default function App() {
                 </CardContent>
               ) : null}
             </Card>
-
-            {allPhonetics.length ? (
-              <Card>
-                <CardContent style={styles.sourceToggleContent}>
-                  <Pressable
-                    accessibilityRole="button"
-                    style={styles.sourceToggle}
-                    onPress={() => setShowSourceData((isVisible) => !isVisible)}
-                  >
-                    <View style={styles.sourceToggleLabel}>
-                      <Ionicons name="code-slash-outline" size={18} color="#475569" />
-                      <Text style={styles.sourceToggleText}>API phonetics</Text>
-                    </View>
-                    <Ionicons name={showSourceData ? "chevron-up" : "chevron-down"} size={20} color="#475569" />
-                  </Pressable>
-                  {showSourceData ? <Text style={styles.apiPreview}>{phoneticsPreview}</Text> : null}
-                </CardContent>
-              </Card>
-            ) : null}
 
             {allMeanings.length ? (
               allMeanings.map((meaning, meaningIndex) => (
@@ -636,25 +609,6 @@ const styles = StyleSheet.create({
     height: 44,
     justifyContent: "center",
     width: 44
-  },
-  recentSearches: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8
-  },
-  recentChip: {
-    backgroundColor: "#f8fafc",
-    borderColor: "#dbe3ef",
-    borderRadius: 8,
-    borderWidth: 1,
-    paddingHorizontal: 11,
-    paddingVertical: 8
-  },
-  recentChipText: {
-    color: "#334155",
-    fontSize: 13,
-    fontWeight: "800",
-    textTransform: "capitalize"
   },
   loadingState: {
     alignItems: "center",
@@ -797,35 +751,6 @@ const styles = StyleSheet.create({
     maxWidth: 160,
     textAlign: "right"
   },
-  apiPreview: {
-    backgroundColor: "#f8fafc",
-    borderColor: "#e2e8f0",
-    borderRadius: 8,
-    borderWidth: 1,
-    color: "#334155",
-    fontSize: 12,
-    lineHeight: 18,
-    marginTop: 10,
-    padding: 12
-  },
-  sourceToggleContent: {
-    paddingTop: 18
-  },
-  sourceToggle: {
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "space-between"
-  },
-  sourceToggleLabel: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 8
-  },
-  sourceToggleText: {
-    color: "#334155",
-    fontSize: 15,
-    fontWeight: "800"
-  },
   meaningHeader: {
     alignItems: "center",
     flexDirection: "row",
@@ -914,6 +839,23 @@ const styles = StyleSheet.create({
     fontWeight: "900",
     letterSpacing: 0
   },
+  clearHistoryButton: {
+    alignItems: "center",
+    backgroundColor: "#fef2f2",
+    borderColor: "#fecaca",
+    borderRadius: 8,
+    borderWidth: 1,
+    flexDirection: "row",
+    gap: 8,
+    justifyContent: "center",
+    marginBottom: 12,
+    minHeight: 44
+  },
+  clearHistoryText: {
+    color: "#b91c1c",
+    fontSize: 14,
+    fontWeight: "800"
+  },
   historyList: {
     gap: 10,
     paddingBottom: 24
@@ -927,7 +869,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 10,
     minHeight: 52,
-    paddingHorizontal: 12
+    paddingLeft: 12,
+    paddingRight: 6
+  },
+  historyWordButton: {
+    alignItems: "center",
+    flex: 1,
+    flexDirection: "row",
+    gap: 10,
+    minHeight: 52
   },
   historyWord: {
     color: "#0f172a",
@@ -935,6 +885,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "700",
     textTransform: "capitalize"
+  },
+  deleteHistoryButton: {
+    alignItems: "center",
+    backgroundColor: "#fee2e2",
+    borderRadius: 8,
+    height: 38,
+    justifyContent: "center",
+    width: 38
   },
   drawerEmpty: {
     backgroundColor: "#f8fafc",
