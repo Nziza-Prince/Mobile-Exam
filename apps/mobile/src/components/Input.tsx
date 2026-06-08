@@ -30,27 +30,36 @@ const styles = StyleSheet.create({
     width: "100%"
   },
   label: {
-    color: "#374151",
-    fontSize: 14,
-    fontWeight: "600",
-    marginBottom: 6
+    color: "#475569",
+    fontSize: 15,
+    fontWeight: "700",
+    marginBottom: 8,
+    letterSpacing: 0.2
   },
   input: {
-    backgroundColor: "#ffffff",
-    borderColor: "#cbd5e1",
-    borderRadius: 8,
-    borderWidth: 1,
+    backgroundColor: "#f8fafc",
+    borderColor: "#e2e8f0",
+    borderRadius: 12,
+    borderWidth: 2,
     color: "#0f172a",
     fontSize: 16,
-    minHeight: 44,
-    paddingHorizontal: 12
+    minHeight: 52,
+    paddingHorizontal: 16,
+    shadowColor: "#000",
+    shadowOffset: { height: 1, width: 0 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1
   },
   inputError: {
-    borderColor: "#dc2626"
+    borderColor: "#ef4444",
+    backgroundColor: "#fef2f2"
   },
   error: {
-    color: "#dc2626",
+    color: "#ef4444",
     fontSize: 13,
-    marginTop: 6
+    fontWeight: "600",
+    marginTop: 8,
+    letterSpacing: 0.2
   }
 });

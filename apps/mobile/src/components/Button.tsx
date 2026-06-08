@@ -50,36 +50,44 @@ export default function Button({
 const styles = StyleSheet.create({
   base: {
     alignItems: "center",
-    borderRadius: 8,
+    borderRadius: 12,
     flexDirection: "row",
-    justifyContent: "center"
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { height: 2, width: 0 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3
   },
   primary: {
-    backgroundColor: "#2563eb"
+    backgroundColor: "#6366f1"
   },
   secondary: {
-    backgroundColor: "#e5e7eb"
+    backgroundColor: "#f1f5f9",
+    borderWidth: 1,
+    borderColor: "#e2e8f0"
   },
   danger: {
-    backgroundColor: "#dc2626"
+    backgroundColor: "#ef4444"
   },
   ghost: {
     backgroundColor: "transparent"
   },
   sm: {
-    minHeight: 36,
-    paddingHorizontal: 12
+    minHeight: 38,
+    paddingHorizontal: 14
   },
   md: {
-    minHeight: 44,
-    paddingHorizontal: 16
-  },
-  lg: {
-    minHeight: 52,
+    minHeight: 48,
     paddingHorizontal: 20
   },
+  lg: {
+    minHeight: 56,
+    paddingHorizontal: 24
+  },
   pressed: {
-    opacity: 0.86
+    opacity: 0.9,
+    transform: [{ scale: 0.98 }]
   },
   disabled: {
     opacity: 0.5
@@ -87,18 +95,18 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: "700",
-    letterSpacing: 0
+    letterSpacing: 0.3
   },
   primaryLabel: {
     color: "#ffffff"
   },
   secondaryLabel: {
-    color: "#111827"
+    color: "#334155"
   },
   dangerLabel: {
     color: "#ffffff"
   },
   ghostLabel: {
-    color: "#374151"
+    color: "#475569"
   }
 });

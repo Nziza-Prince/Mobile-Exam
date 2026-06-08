@@ -36,27 +36,27 @@ export function CardContent({ children, style, ...props }: PropsWithChildren<Vie
 const styles = StyleSheet.create({
   card: {
     backgroundColor: "#ffffff",
-    borderColor: "#e2e8f0",
-    borderRadius: 8,
-    borderWidth: 1,
-    shadowColor: "#0f172a",
-    shadowOffset: { height: 2, width: 0 },
-    shadowOpacity: 0.06,
-    shadowRadius: 10
+    borderRadius: 16,
+    shadowColor: "#1e293b",
+    shadowOffset: { height: 4, width: 0 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4
   },
   header: {
-    gap: 4,
-    padding: 18
+    gap: 6,
+    padding: 20,
+    paddingBottom: 16
   },
   title: {
     color: "#0f172a",
-    fontSize: 21,
+    fontSize: 22,
     fontWeight: "800",
-    letterSpacing: 0,
-    lineHeight: 27
+    letterSpacing: -0.3,
+    lineHeight: 28
   },
   content: {
-    padding: 18,
+    padding: 20,
     paddingTop: 0
   }
 });

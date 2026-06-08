@@ -258,7 +258,7 @@ export default function App() {
       return (
         <Card>
           <CardContent style={styles.loadingState}>
-            <ActivityIndicator color="#1d4ed8" size="large" />
+            <ActivityIndicator color="#6366f1" size="large" />
             <Text style={styles.mutedText}>Searching the dictionary...</Text>
           </CardContent>
         </Card>
@@ -269,7 +269,7 @@ export default function App() {
       return (
         <Card style={styles.feedbackCard}>
           <CardContent style={styles.feedbackContent}>
-            <Ionicons name="alert-circle-outline" size={34} color="#b91c1c" />
+            <Ionicons name="alert-circle-outline" size={40} color="#ef4444" />
             <Text style={styles.feedbackTitle}>{errorMessage}</Text>
             <Button disabled={!searchTerm.trim()} onPress={() => searchWord()}>
               Retry search
@@ -283,7 +283,7 @@ export default function App() {
       return (
         <Card>
           <CardContent style={styles.feedbackContent}>
-            <Ionicons name="book-outline" size={34} color="#1d4ed8" />
+            <Ionicons name="book-outline" size={40} color="#6366f1" />
             <Text style={styles.feedbackTitle}>Search a word to view meanings and examples.</Text>
           </CardContent>
         </Card>
@@ -306,14 +306,14 @@ export default function App() {
                 <Text style={styles.drawerTitle}>Search History</Text>
               </View>
               <Pressable accessibilityRole="button" style={styles.iconButton} onPress={() => setIsDrawerOpen(false)}>
-                <Ionicons name="close" size={22} color="#111827" />
+                <Ionicons name="close" size={24} color="#475569" />
               </Pressable>
             </View>
 
             {history.length ? (
               <>
                 <Pressable accessibilityRole="button" style={styles.clearHistoryButton} onPress={clearHistory}>
-                  <Ionicons name="trash-outline" size={17} color="#b91c1c" />
+                  <Ionicons name="trash-outline" size={20} color="#ef4444" />
                   <Text style={styles.clearHistoryText}>Clear all history</Text>
                 </Pressable>
                 <ScrollView contentContainerStyle={styles.historyList}>
@@ -327,7 +327,7 @@ export default function App() {
                           searchWord(historyWord);
                         }}
                       >
-                        <Ionicons name="time-outline" size={19} color="#0f766e" />
+                        <Ionicons name="time-outline" size={22} color="#6366f1" />
                         <Text style={styles.historyWord}>{historyWord}</Text>
                       </Pressable>
                       <Pressable
@@ -335,7 +335,7 @@ export default function App() {
                         style={styles.deleteHistoryButton}
                         onPress={() => removeHistoryWord(historyWord)}
                       >
-                        <Ionicons name="close" size={18} color="#b91c1c" />
+                        <Ionicons name="close" size={20} color="#ef4444" />
                       </Pressable>
                     </View>
                   ))}
@@ -354,7 +354,7 @@ export default function App() {
       <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.shell}>
         <View style={styles.topbar}>
           <Pressable accessibilityRole="button" style={styles.iconButton} onPress={() => setIsDrawerOpen(true)}>
-            <Ionicons name="menu" size={24} color="#111827" />
+            <Ionicons name="menu" size={26} color="#475569" />
           </Pressable>
           <View style={styles.brandBlock}>
             <Text style={styles.eyebrow}>LexiTech Dictionary</Text>
@@ -362,7 +362,7 @@ export default function App() {
           </View>
           {history.length ? (
             <View style={styles.historyBadge}>
-              <Ionicons name="time-outline" size={16} color="#0f766e" />
+              <Ionicons name="time-outline" size={18} color="#6366f1" />
               <Text style={styles.historyBadgeText}>{history.length}</Text>
             </View>
           ) : null}
@@ -407,7 +407,7 @@ export default function App() {
                     setPlaybackMessage("");
                   }}
                 >
-                  <Ionicons name="close-circle-outline" size={22} color="#475569" />
+                  <Ionicons name="close-circle-outline" size={24} color="#64748b" />
                 </Pressable>
               ) : null}
             </View>
@@ -449,7 +449,7 @@ export default function App() {
                         />
                       </Pressable>
                       <Pressable accessibilityRole="button" style={styles.stopButton} onPress={stopAudioPlayback}>
-                        <Ionicons name="stop" size={18} color="#0f172a" />
+                        <Ionicons name="stop" size={20} color="#475569" />
                       </Pressable>
                     </View>
 
@@ -475,8 +475,8 @@ export default function App() {
                       >
                         <Ionicons
                           name={selectedAudioIndex === index ? "radio-button-on" : "radio-button-off"}
-                          size={15}
-                          color={selectedAudioIndex === index ? "#0f766e" : "#64748b"}
+                          size={18}
+                          color={selectedAudioIndex === index ? "#6366f1" : "#94a3b8"}
                         />
                         <Text
                           style={[
@@ -533,71 +533,80 @@ export default function App() {
 
 const styles = StyleSheet.create({
   safeArea: {
-    backgroundColor: "#f5f7fb",
+    backgroundColor: "#f8fafc",
     flex: 1
   },
   shell: {
-    gap: 16,
-    padding: 18,
-    paddingBottom: 34
+    gap: 20,
+    padding: 20,
+    paddingBottom: 40
   },
   topbar: {
     alignItems: "center",
     flexDirection: "row",
-    gap: 12
+    gap: 16,
+    marginBottom: 8
   },
   brandBlock: {
     flex: 1
   },
   eyebrow: {
-    color: "#0f766e",
-    fontSize: 12,
-    fontWeight: "800",
-    letterSpacing: 0,
-    marginBottom: 4,
+    color: "#6366f1",
+    fontSize: 13,
+    fontWeight: "900",
+    letterSpacing: 1.2,
+    marginBottom: 6,
     textTransform: "uppercase"
   },
   title: {
     color: "#0f172a",
-    fontSize: 30,
-    fontWeight: "800",
-    letterSpacing: 0,
-    lineHeight: 34
+    fontSize: 34,
+    fontWeight: "900",
+    letterSpacing: -0.5,
+    lineHeight: 38
   },
   historyBadge: {
     alignItems: "center",
-    backgroundColor: "#ccfbf1",
-    borderRadius: 8,
+    backgroundColor: "#eef2ff",
+    borderRadius: 12,
     flexDirection: "row",
-    gap: 5,
-    minHeight: 36,
-    paddingHorizontal: 10
+    gap: 6,
+    minHeight: 40,
+    paddingHorizontal: 14,
+    shadowColor: "#6366f1",
+    shadowOffset: { height: 2, width: 0 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 2
   },
   historyBadgeText: {
-    color: "#0f766e",
-    fontSize: 14,
+    color: "#6366f1",
+    fontSize: 15,
     fontWeight: "900"
   },
   iconButton: {
     alignItems: "center",
     backgroundColor: "#ffffff",
-    borderColor: "#dbe3ef",
-    borderRadius: 8,
-    borderWidth: 1,
-    height: 44,
+    borderRadius: 12,
+    height: 48,
     justifyContent: "center",
-    width: 44
+    width: 48,
+    shadowColor: "#1e293b",
+    shadowOffset: { height: 2, width: 0 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2
   },
   searchCard: {
-    borderColor: "#cbd5e1"
+    backgroundColor: "#ffffff"
   },
   searchForm: {
-    gap: 14
+    gap: 16
   },
   searchActions: {
     alignItems: "center",
     flexDirection: "row",
-    gap: 10
+    gap: 12
   },
   searchButtonWrap: {
     flex: 1
@@ -605,149 +614,180 @@ const styles = StyleSheet.create({
   clearButton: {
     alignItems: "center",
     backgroundColor: "#f1f5f9",
-    borderRadius: 8,
-    height: 44,
+    borderRadius: 12,
+    height: 48,
     justifyContent: "center",
-    width: 44
+    width: 48,
+    shadowColor: "#000",
+    shadowOffset: { height: 1, width: 0 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1
   },
   loadingState: {
     alignItems: "center",
-    gap: 12,
-    paddingTop: 18
+    gap: 16,
+    paddingTop: 24,
+    paddingBottom: 24
   },
   mutedText: {
     color: "#64748b",
-    fontSize: 15,
-    lineHeight: 21
+    fontSize: 16,
+    lineHeight: 24,
+    fontWeight: "600"
   },
   feedbackCard: {
-    borderColor: "#fecaca"
+    backgroundColor: "#fef2f2"
   },
   feedbackContent: {
     alignItems: "center",
-    gap: 14,
-    paddingTop: 18
+    gap: 16,
+    paddingTop: 24,
+    paddingBottom: 24
   },
   feedbackTitle: {
-    color: "#334155",
-    fontSize: 16,
+    color: "#475569",
+    fontSize: 17,
     fontWeight: "700",
-    lineHeight: 23,
-    textAlign: "center"
+    lineHeight: 25,
+    textAlign: "center",
+    letterSpacing: 0.2
   },
   results: {
-    gap: 16
+    gap: 20
   },
   wordCard: {
-    borderColor: "#bfdbfe"
+    backgroundColor: "#ffffff",
+    borderLeftWidth: 4,
+    borderLeftColor: "#6366f1"
   },
   wordHeader: {
     alignItems: "flex-start",
     flexDirection: "row",
-    gap: 14,
+    gap: 16,
     justifyContent: "space-between",
-    paddingTop: 18
+    paddingTop: 24
   },
   wordTitleBlock: {
     flex: 1,
-    gap: 4
+    gap: 8
   },
   word: {
     color: "#0f172a",
-    fontSize: 34,
+    fontSize: 36,
     fontWeight: "900",
-    letterSpacing: 0,
+    letterSpacing: -0.5,
     textTransform: "capitalize"
   },
   phonetic: {
-    color: "#475569",
-    fontSize: 17,
-    fontWeight: "600"
+    color: "#64748b",
+    fontSize: 18,
+    fontWeight: "600",
+    letterSpacing: 0.3
   },
   summaryChips: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 7,
-    marginTop: 8
+    gap: 8,
+    marginTop: 12
   },
   summaryChip: {
-    backgroundColor: "#eff6ff",
-    borderRadius: 8,
-    paddingHorizontal: 9,
-    paddingVertical: 6
+    backgroundColor: "#eef2ff",
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderWidth: 1,
+    borderColor: "#c7d2fe"
   },
   summaryChipText: {
-    color: "#1d4ed8",
-    fontSize: 12,
-    fontWeight: "900"
+    color: "#6366f1",
+    fontSize: 13,
+    fontWeight: "800",
+    letterSpacing: 0.3
   },
   audioPanel: {
     alignItems: "flex-end",
-    gap: 10
+    gap: 12
   },
   audioButtons: {
     flexDirection: "row",
-    gap: 8
+    gap: 10
   },
   audioButton: {
     alignItems: "center",
-    backgroundColor: "#1d4ed8",
-    borderRadius: 8,
-    height: 46,
+    backgroundColor: "#6366f1",
+    borderRadius: 14,
+    height: 54,
     justifyContent: "center",
-    width: 46
+    width: 54,
+    shadowColor: "#6366f1",
+    shadowOffset: { height: 4, width: 0 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 4
   },
   stopButton: {
     alignItems: "center",
-    backgroundColor: "#e2e8f0",
-    borderRadius: 8,
-    height: 46,
+    backgroundColor: "#f1f5f9",
+    borderRadius: 14,
+    height: 54,
     justifyContent: "center",
-    width: 46
+    width: 54,
+    shadowColor: "#000",
+    shadowOffset: { height: 2, width: 0 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2
   },
   pronunciationArea: {
     borderTopColor: "#e2e8f0",
     borderTopWidth: 1,
-    gap: 10,
-    paddingTop: 14
+    gap: 14,
+    paddingTop: 20,
+    marginTop: 8
   },
   sectionLabel: {
-    color: "#475569",
-    fontSize: 13,
+    color: "#64748b",
+    fontSize: 14,
     fontWeight: "900",
-    textTransform: "uppercase"
+    textTransform: "uppercase",
+    letterSpacing: 1
   },
   audioChoices: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 6,
+    gap: 10,
     justifyContent: "flex-start"
   },
   audioChoice: {
     alignItems: "center",
-    backgroundColor: "#e2e8f0",
-    borderRadius: 8,
+    backgroundColor: "#f8fafc",
+    borderRadius: 10,
     flexDirection: "row",
-    gap: 6,
-    paddingHorizontal: 9,
-    paddingVertical: 6
+    gap: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderWidth: 2,
+    borderColor: "#e2e8f0"
   },
   audioChoiceActive: {
-    backgroundColor: "#ccfbf1"
+    backgroundColor: "#eef2ff",
+    borderColor: "#6366f1"
   },
   audioChoiceText: {
-    color: "#334155",
-    fontSize: 12,
-    fontWeight: "800"
+    color: "#475569",
+    fontSize: 13,
+    fontWeight: "800",
+    letterSpacing: 0.2
   },
   audioChoiceTextActive: {
-    color: "#0f766e"
+    color: "#6366f1"
   },
   audioError: {
-    color: "#b91c1c",
-    fontSize: 12,
+    color: "#ef4444",
+    fontSize: 13,
     fontWeight: "700",
-    lineHeight: 16,
+    lineHeight: 18,
     maxWidth: 160,
     textAlign: "right"
   },
@@ -758,147 +798,163 @@ const styles = StyleSheet.create({
   },
   partOfSpeech: {
     alignSelf: "flex-start",
-    backgroundColor: "#eef2ff",
-    borderRadius: 8,
-    color: "#3730a3",
-    fontSize: 15,
+    backgroundColor: "#f0fdf4",
+    borderRadius: 12,
+    color: "#15803d",
+    fontSize: 16,
     fontWeight: "800",
     overflow: "hidden",
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    textTransform: "capitalize"
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    textTransform: "capitalize",
+    borderWidth: 1,
+    borderColor: "#bbf7d0"
   },
   definitionCountText: {
-    color: "#64748b",
-    fontSize: 13,
-    fontWeight: "800"
+    color: "#94a3b8",
+    fontSize: 14,
+    fontWeight: "800",
+    letterSpacing: 0.3
   },
   definitionList: {
-    gap: 16
+    gap: 20
   },
   definitionItem: {
     alignItems: "flex-start",
     flexDirection: "row",
-    gap: 12
+    gap: 14
   },
   definitionNumber: {
-    backgroundColor: "#f1f5f9",
-    borderRadius: 8,
-    color: "#0f766e",
-    fontSize: 14,
+    backgroundColor: "#eef2ff",
+    borderRadius: 10,
+    color: "#6366f1",
+    fontSize: 15,
     fontWeight: "900",
-    minWidth: 30,
+    minWidth: 34,
     overflow: "hidden",
-    paddingVertical: 6,
-    textAlign: "center"
+    paddingVertical: 8,
+    textAlign: "center",
+    borderWidth: 1,
+    borderColor: "#c7d2fe"
   },
   definitionTextBlock: {
     flex: 1,
-    gap: 8
+    gap: 10
   },
   definitionText: {
     color: "#1e293b",
-    fontSize: 16,
-    lineHeight: 24
+    fontSize: 17,
+    lineHeight: 26,
+    fontWeight: "500",
+    letterSpacing: 0.2
   },
   exampleText: {
     color: "#64748b",
-    fontSize: 15,
+    fontSize: 16,
     fontStyle: "italic",
-    lineHeight: 22
+    lineHeight: 24,
+    paddingLeft: 12,
+    borderLeftWidth: 3,
+    borderLeftColor: "#cbd5e1"
   },
   drawerOverlay: {
     flex: 1,
     flexDirection: "row"
   },
   drawerScrim: {
-    backgroundColor: "rgba(15, 23, 42, 0.42)",
+    backgroundColor: "rgba(15, 23, 42, 0.5)",
     flex: 1
   },
   drawer: {
     backgroundColor: "#ffffff",
-    elevation: 12,
+    elevation: 16,
     height: "100%",
-    padding: 18,
+    padding: 22,
     shadowColor: "#0f172a",
-    shadowOffset: { height: 0, width: -4 },
-    shadowOpacity: 0.16,
-    shadowRadius: 16,
-    width: 304
+    shadowOffset: { height: 0, width: -6 },
+    shadowOpacity: 0.2,
+    shadowRadius: 20,
+    width: 320
   },
   drawerHeader: {
     alignItems: "center",
     flexDirection: "row",
-    gap: 12,
+    gap: 14,
     justifyContent: "space-between",
-    marginBottom: 18
+    marginBottom: 24
   },
   drawerTitle: {
     color: "#0f172a",
-    fontSize: 23,
+    fontSize: 26,
     fontWeight: "900",
-    letterSpacing: 0
+    letterSpacing: -0.3
   },
   clearHistoryButton: {
     alignItems: "center",
     backgroundColor: "#fef2f2",
-    borderColor: "#fecaca",
-    borderRadius: 8,
-    borderWidth: 1,
+    borderRadius: 12,
     flexDirection: "row",
-    gap: 8,
+    gap: 10,
     justifyContent: "center",
-    marginBottom: 12,
-    minHeight: 44
+    marginBottom: 16,
+    minHeight: 50,
+    shadowColor: "#ef4444",
+    shadowOffset: { height: 2, width: 0 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 2
   },
   clearHistoryText: {
-    color: "#b91c1c",
-    fontSize: 14,
-    fontWeight: "800"
+    color: "#ef4444",
+    fontSize: 15,
+    fontWeight: "800",
+    letterSpacing: 0.3
   },
   historyList: {
-    gap: 10,
-    paddingBottom: 24
+    gap: 12,
+    paddingBottom: 28
   },
   historyItem: {
     alignItems: "center",
-    backgroundColor: "#f8fafc",
-    borderColor: "#e2e8f0",
-    borderRadius: 8,
-    borderWidth: 1,
+    backgroundColor: "#ffffff",
+    borderRadius: 12,
     flexDirection: "row",
-    gap: 10,
-    minHeight: 52,
-    paddingLeft: 12,
-    paddingRight: 6
+    gap: 12,
+    minHeight: 60,
+    paddingLeft: 16,
+    paddingRight: 8,
+    shadowColor: "#1e293b",
+    shadowOffset: { height: 2, width: 0 },
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    elevation: 2
   },
   historyWordButton: {
     alignItems: "center",
     flex: 1,
     flexDirection: "row",
-    gap: 10,
-    minHeight: 52
+    gap: 12,
+    minHeight: 60
   },
   historyWord: {
     color: "#0f172a",
     flex: 1,
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: "700",
-    textTransform: "capitalize"
+    textTransform: "capitalize",
+    letterSpacing: 0.2
   },
   deleteHistoryButton: {
     alignItems: "center",
     backgroundColor: "#fee2e2",
-    borderRadius: 8,
-    height: 38,
+    borderRadius: 10,
+    height: 42,
     justifyContent: "center",
-    width: 38
+    width: 42
   },
   drawerEmpty: {
     backgroundColor: "#f8fafc",
-    borderColor: "#e2e8f0",
-    borderRadius: 8,
-    borderWidth: 1,
-    padding: 14
+    borderRadius: 12,
+    padding: 20
   }
 });
