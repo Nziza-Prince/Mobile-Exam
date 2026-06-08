@@ -135,10 +135,15 @@ export default function App() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedAudioIndex, setSelectedAudioIndex] = useState(0);
   const [playbackMessage, setPlaybackMessage] = useState("");
+  const [showSourceData, setShowSourceData] = useState(false);
 
   const entry = entries[0];
   const allPhonetics = useMemo(() => entries.flatMap((wordEntry) => wordEntry.phonetics ?? []), [entries]);
   const allMeanings = useMemo(() => entries.flatMap((wordEntry) => wordEntry.meanings ?? []), [entries]);
+  const definitionCount = useMemo(
+    () => allMeanings.reduce((total, meaning) => total + meaning.definitions.length, 0),
+    [allMeanings]
+  );
   const phoneticText =
     entry?.phonetic || allPhonetics.find((phonetic) => phonetic.text)?.text || "";
   const audioOptions = useMemo(() => getAudioOptions(allPhonetics), [allPhonetics]);
@@ -181,6 +186,7 @@ export default function App() {
     setInputError("");
     setErrorMessage("");
     setPlaybackMessage("");
+    setShowSourceData(false);
     setIsLoading(true);
     setSelectedAudioIndex(0);
 
@@ -346,13 +352,19 @@ export default function App() {
           </Pressable>
           <View style={styles.brandBlock}>
             <Text style={styles.eyebrow}>LexiTech Dictionary</Text>
-            <Text style={styles.title}>Find English meanings fast</Text>
+            <Text style={styles.title}>Dictionary</Text>
           </View>
+          {history.length ? (
+            <View style={styles.historyBadge}>
+              <Ionicons name="time-outline" size={16} color="#0f766e" />
+              <Text style={styles.historyBadgeText}>{history.length}</Text>
+            </View>
+          ) : null}
         </View>
 
-        <Card>
+        <Card style={styles.searchCard}>
           <CardHeader>
-            <CardTitle>Word Search</CardTitle>
+            <CardTitle>Find a Word</CardTitle>
           </CardHeader>
           <CardContent style={styles.searchForm}>
             <Input
@@ -371,9 +383,42 @@ export default function App() {
               }}
               onSubmitEditing={() => searchWord()}
             />
-            <Button disabled={!searchTerm.trim()} isLoading={isLoading} onPress={() => searchWord()}>
-              Search
-            </Button>
+            <View style={styles.searchActions}>
+              <View style={styles.searchButtonWrap}>
+                <Button disabled={!searchTerm.trim()} isLoading={isLoading} onPress={() => searchWord()}>
+                  Search
+                </Button>
+              </View>
+              {searchTerm ? (
+                <Pressable
+                  accessibilityRole="button"
+                  style={styles.clearButton}
+                  onPress={() => {
+                    setSearchTerm("");
+                    setInputError("");
+                    setErrorMessage("");
+                    setEntries([]);
+                    setPlaybackMessage("");
+                  }}
+                >
+                  <Ionicons name="close-circle-outline" size={22} color="#475569" />
+                </Pressable>
+              ) : null}
+            </View>
+            {history.length ? (
+              <View style={styles.recentSearches}>
+                {history.slice(0, 4).map((historyWord) => (
+                  <Pressable
+                    accessibilityRole="button"
+                    key={historyWord.toLowerCase()}
+                    style={styles.recentChip}
+                    onPress={() => searchWord(historyWord)}
+                  >
+                    <Text style={styles.recentChipText}>{historyWord}</Text>
+                  </Pressable>
+                ))}
+              </View>
+            ) : null}
           </CardContent>
         </Card>
 
@@ -381,11 +426,24 @@ export default function App() {
 
         {entry ? (
           <View style={styles.results}>
-            <Card>
+            <Card style={styles.wordCard}>
               <CardContent style={styles.wordHeader}>
                 <View style={styles.wordTitleBlock}>
                   <Text style={styles.word}>{entry.word}</Text>
                   {phoneticText ? <Text style={styles.phonetic}>{phoneticText}</Text> : null}
+                  <View style={styles.summaryChips}>
+                    <View style={styles.summaryChip}>
+                      <Text style={styles.summaryChipText}>{allMeanings.length} meanings</Text>
+                    </View>
+                    <View style={styles.summaryChip}>
+                      <Text style={styles.summaryChipText}>{definitionCount} definitions</Text>
+                    </View>
+                    {audioOptions.length ? (
+                      <View style={styles.summaryChip}>
+                        <Text style={styles.summaryChipText}>{audioOptions.length} audio</Text>
+                      </View>
+                    ) : null}
+                  </View>
                 </View>
 
                 {selectedAudioUrl ? (
@@ -403,28 +461,6 @@ export default function App() {
                       </Pressable>
                     </View>
 
-                    {audioOptions.length > 1 ? (
-                      <View style={styles.audioChoices}>
-                        {audioOptions.map((option, index) => (
-                          <Pressable
-                            accessibilityRole="button"
-                            key={option.url}
-                            style={[styles.audioChoice, selectedAudioIndex === index && styles.audioChoiceActive]}
-                            onPress={() => selectAudio(index)}
-                          >
-                            <Text
-                              style={[
-                                styles.audioChoiceText,
-                                selectedAudioIndex === index && styles.audioChoiceTextActive
-                              ]}
-                            >
-                              {option.label}
-                            </Text>
-                          </Pressable>
-                        ))}
-                      </View>
-                    ) : null}
-
                     {playbackMessage || audioStatus.error ? (
                       <Text style={styles.audioError}>
                         {playbackMessage || "This pronunciation audio could not be loaded."}
@@ -433,15 +469,53 @@ export default function App() {
                   </View>
                 ) : null}
               </CardContent>
+
+              {audioOptions.length > 1 ? (
+                <CardContent style={styles.pronunciationArea}>
+                  <Text style={styles.sectionLabel}>Pronunciations</Text>
+                  <View style={styles.audioChoices}>
+                    {audioOptions.map((option, index) => (
+                      <Pressable
+                        accessibilityRole="button"
+                        key={option.url}
+                        style={[styles.audioChoice, selectedAudioIndex === index && styles.audioChoiceActive]}
+                        onPress={() => selectAudio(index)}
+                      >
+                        <Ionicons
+                          name={selectedAudioIndex === index ? "radio-button-on" : "radio-button-off"}
+                          size={15}
+                          color={selectedAudioIndex === index ? "#0f766e" : "#64748b"}
+                        />
+                        <Text
+                          style={[
+                            styles.audioChoiceText,
+                            selectedAudioIndex === index && styles.audioChoiceTextActive
+                          ]}
+                        >
+                          {option.label}
+                        </Text>
+                      </Pressable>
+                    ))}
+                  </View>
+                </CardContent>
+              ) : null}
             </Card>
 
             {allPhonetics.length ? (
               <Card>
-                <CardHeader>
-                  <CardTitle>API Phonetics</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Text style={styles.apiPreview}>{phoneticsPreview}</Text>
+                <CardContent style={styles.sourceToggleContent}>
+                  <Pressable
+                    accessibilityRole="button"
+                    style={styles.sourceToggle}
+                    onPress={() => setShowSourceData((isVisible) => !isVisible)}
+                  >
+                    <View style={styles.sourceToggleLabel}>
+                      <Ionicons name="code-slash-outline" size={18} color="#475569" />
+                      <Text style={styles.sourceToggleText}>API phonetics</Text>
+                    </View>
+                    <Ionicons name={showSourceData ? "chevron-up" : "chevron-down"} size={20} color="#475569" />
+                  </Pressable>
+                  {showSourceData ? <Text style={styles.apiPreview}>{phoneticsPreview}</Text> : null}
                 </CardContent>
               </Card>
             ) : null}
@@ -449,8 +523,11 @@ export default function App() {
             {allMeanings.length ? (
               allMeanings.map((meaning, meaningIndex) => (
                 <Card key={`${meaning.partOfSpeech}-${meaningIndex}`}>
-                  <CardHeader>
+                  <CardHeader style={styles.meaningHeader}>
                     <Text style={styles.partOfSpeech}>{meaning.partOfSpeech}</Text>
+                    <Text style={styles.definitionCountText}>
+                      {meaning.definitions.length} {meaning.definitions.length === 1 ? "definition" : "definitions"}
+                    </Text>
                   </CardHeader>
                   <CardContent style={styles.definitionList}>
                     {meaning.definitions.map((definition, definitionIndex) => (
@@ -509,10 +586,24 @@ const styles = StyleSheet.create({
   },
   title: {
     color: "#0f172a",
-    fontSize: 28,
+    fontSize: 30,
     fontWeight: "800",
     letterSpacing: 0,
     lineHeight: 34
+  },
+  historyBadge: {
+    alignItems: "center",
+    backgroundColor: "#ccfbf1",
+    borderRadius: 8,
+    flexDirection: "row",
+    gap: 5,
+    minHeight: 36,
+    paddingHorizontal: 10
+  },
+  historyBadgeText: {
+    color: "#0f766e",
+    fontSize: 14,
+    fontWeight: "900"
   },
   iconButton: {
     alignItems: "center",
@@ -524,8 +615,46 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: 44
   },
+  searchCard: {
+    borderColor: "#cbd5e1"
+  },
   searchForm: {
     gap: 14
+  },
+  searchActions: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 10
+  },
+  searchButtonWrap: {
+    flex: 1
+  },
+  clearButton: {
+    alignItems: "center",
+    backgroundColor: "#f1f5f9",
+    borderRadius: 8,
+    height: 44,
+    justifyContent: "center",
+    width: 44
+  },
+  recentSearches: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8
+  },
+  recentChip: {
+    backgroundColor: "#f8fafc",
+    borderColor: "#dbe3ef",
+    borderRadius: 8,
+    borderWidth: 1,
+    paddingHorizontal: 11,
+    paddingVertical: 8
+  },
+  recentChipText: {
+    color: "#334155",
+    fontSize: 13,
+    fontWeight: "800",
+    textTransform: "capitalize"
   },
   loadingState: {
     alignItems: "center",
@@ -555,8 +684,11 @@ const styles = StyleSheet.create({
   results: {
     gap: 16
   },
+  wordCard: {
+    borderColor: "#bfdbfe"
+  },
   wordHeader: {
-    alignItems: "center",
+    alignItems: "flex-start",
     flexDirection: "row",
     gap: 14,
     justifyContent: "space-between",
@@ -577,6 +709,23 @@ const styles = StyleSheet.create({
     color: "#475569",
     fontSize: 17,
     fontWeight: "600"
+  },
+  summaryChips: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 7,
+    marginTop: 8
+  },
+  summaryChip: {
+    backgroundColor: "#eff6ff",
+    borderRadius: 8,
+    paddingHorizontal: 9,
+    paddingVertical: 6
+  },
+  summaryChipText: {
+    color: "#1d4ed8",
+    fontSize: 12,
+    fontWeight: "900"
   },
   audioPanel: {
     alignItems: "flex-end",
@@ -602,16 +751,30 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: 46
   },
+  pronunciationArea: {
+    borderTopColor: "#e2e8f0",
+    borderTopWidth: 1,
+    gap: 10,
+    paddingTop: 14
+  },
+  sectionLabel: {
+    color: "#475569",
+    fontSize: 13,
+    fontWeight: "900",
+    textTransform: "uppercase"
+  },
   audioChoices: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 6,
-    justifyContent: "flex-end",
-    maxWidth: 148
+    justifyContent: "flex-start"
   },
   audioChoice: {
+    alignItems: "center",
     backgroundColor: "#e2e8f0",
     borderRadius: 8,
+    flexDirection: "row",
+    gap: 6,
     paddingHorizontal: 9,
     paddingVertical: 6
   },
@@ -642,7 +805,31 @@ const styles = StyleSheet.create({
     color: "#334155",
     fontSize: 12,
     lineHeight: 18,
+    marginTop: 10,
     padding: 12
+  },
+  sourceToggleContent: {
+    paddingTop: 18
+  },
+  sourceToggle: {
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between"
+  },
+  sourceToggleLabel: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 8
+  },
+  sourceToggleText: {
+    color: "#334155",
+    fontSize: 15,
+    fontWeight: "800"
+  },
+  meaningHeader: {
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between"
   },
   partOfSpeech: {
     alignSelf: "flex-start",
@@ -655,6 +842,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 7,
     textTransform: "capitalize"
+  },
+  definitionCountText: {
+    color: "#64748b",
+    fontSize: 13,
+    fontWeight: "800"
   },
   definitionList: {
     gap: 16
