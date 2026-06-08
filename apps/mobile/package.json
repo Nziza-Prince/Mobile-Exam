@@ -12,17 +12,18 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.4",
+    "@hookform/resolvers": "^3.9.0",
     "@react-native-async-storage/async-storage": "^2.2.0",
     "axios": "^1.7.7",
     "date-fns": "^4.1.0",
     "expo": "~56.0.0",
+    "expo-audio": "~56.0.11",
     "expo-status-bar": "~3.0.0",
     "react": "19.2.3",
     "react-hook-form": "^7.53.0",
     "react-native": "0.85.0",
     "react-native-safe-area-context": "^5.6.0",
     "zod": "^3.23.8",
-    "@hookform/resolvers": "^3.9.0",
     "zustand": "^5.0.0"
   },
   "devDependencies": {
