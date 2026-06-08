@@ -1,0 +1,57 @@
+flowchart TD
+    A[Open App] --> B[Load search history from AsyncStorage]
+    B --> C[Display search screen]
+
+    C --> D[User enters a word]
+    D --> E[Trim and sanitize input]
+    E --> F{Is input valid?}
+
+    F -->|No| G[Show validation error]
+    F -->|Yes| H[Build Dictionary API URL]
+
+    H --> I[Send Axios GET request]
+    I --> J{API response}
+
+    J -->|Success| K[Parse JSON response]
+    J -->|404 Not Found| L[Show word not found message]
+    J -->|Network/API error| M[Show error message]
+
+    K --> N[Store word data in app state]
+    N --> O[Render word details]
+
+    O --> P[Display searched word]
+    O --> Q[Display phonetic spelling]
+    O --> R[Display parts of speech]
+    O --> S[Display definitions]
+    O --> T[Display examples if available]
+
+    O --> U{Audio URL exists?}
+    U -->|Yes| V[Show pronunciation controls]
+    U -->|No| W[Hide pronunciation controls]
+
+    V --> X[Play audio]
+    V --> Y[Pause audio]
+    V --> Z[Stop audio]
+
+    N --> AA[Add searched word to history]
+    AA --> AB[Prevent duplicate history entries]
+    AB --> AC[Save history in AsyncStorage]
+
+    AC --> AD[Display history in drawer]
+
+    AD --> AE{Drawer action}
+    AE -->|Tap word| H
+    AE -->|Delete word| AF[Remove selected word from history]
+    AE -->|Clear all| AG[Clear all history]
+
+    AF --> AC
+    AG --> AC
+
+    O --> AH[User scrolls through results]
+    AH --> AI[Show New Search button]
+    AI --> AJ[Scroll back to search input]
+    AJ --> AK[Auto focus input]
+
+    L --> AL[Allow retry]
+    M --> AL
+    AL --> H
