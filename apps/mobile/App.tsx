@@ -2,18 +2,21 @@ import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 import { setAudioModeAsync, useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Keyboard,
   Modal,
   Pressable,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import Button from "./src/components/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "./src/components/Card";
 import Input from "./src/components/Input";
@@ -120,6 +123,17 @@ function getAudioOptions(phonetics: DictionaryPhonetic[]) {
 }
 
 export default function App() {
+  return (
+    <SafeAreaProvider>
+      <DictionaryApp />
+    </SafeAreaProvider>
+  );
+}
+
+function DictionaryApp() {
+  const scrollViewRef = useRef<ScrollView>(null);
+  const searchInputRef = useRef<TextInput>(null);
+  const insets = useSafeAreaInsets();
   const [searchTerm, setSearchTerm] = useState("");
   const [inputError, setInputError] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -129,6 +143,7 @@ export default function App() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedAudioIndex, setSelectedAudioIndex] = useState(0);
   const [playbackMessage, setPlaybackMessage] = useState("");
+  const [showJumpToSearch, setShowJumpToSearch] = useState(false);
   const [debugMode, setDebugMode] = useState(false);
   const [simulateNetworkError, setSimulateNetworkError] = useState(false);
   const [titleTapCount, setTitleTapCount] = useState(0);
@@ -281,6 +296,15 @@ export default function App() {
     setHistory([]);
   }
 
+  function handleScroll(event: NativeSyntheticEvent<NativeScrollEvent>) {
+    setShowJumpToSearch(Boolean(entry) && event.nativeEvent.contentOffset.y > 260);
+  }
+
+  function jumpToSearch() {
+    scrollViewRef.current?.scrollTo({ animated: true, y: 0 });
+    setTimeout(() => searchInputRef.current?.focus(), 350);
+  }
+
   function renderEmptyState() {
     if (isLoading) {
       return (
@@ -379,7 +403,13 @@ export default function App() {
         </View>
       </Modal>
 
-      <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.shell}>
+      <ScrollView
+        ref={scrollViewRef}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={styles.shell}
+        scrollEventThrottle={16}
+        onScroll={handleScroll}
+      >
         <View style={styles.topbar}>
           <Pressable accessibilityRole="button" style={styles.iconButton} onPress={() => setIsDrawerOpen(true)}>
             <Ionicons name="menu" size={26} color="#475569" />
@@ -419,6 +449,7 @@ export default function App() {
               </Pressable>
             )}
             <Input
+              ref={searchInputRef}
               autoCapitalize="none"
               autoCorrect={false}
               error={inputError}
@@ -572,6 +603,17 @@ export default function App() {
           </View>
         ) : null}
       </ScrollView>
+
+      {showJumpToSearch ? (
+        <Pressable
+          accessibilityRole="button"
+          style={[styles.jumpToSearchButton, { bottom: Math.max(insets.bottom + 20, 36) }]}
+          onPress={jumpToSearch}
+        >
+          <Ionicons name="search" size={20} color="#ffffff" />
+          <Text style={styles.jumpToSearchText}>New search</Text>
+        </Pressable>
+      ) : null}
     </SafeAreaView>
   );
 }
@@ -668,6 +710,27 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 1
+  },
+  jumpToSearchButton: {
+    alignItems: "center",
+    backgroundColor: "#6366f1",
+    borderRadius: 12,
+    elevation: 8,
+    flexDirection: "row",
+    gap: 8,
+    minHeight: 50,
+    paddingHorizontal: 18,
+    position: "absolute",
+    right: 20,
+    shadowColor: "#1e293b",
+    shadowOffset: { height: 4, width: 0 },
+    shadowOpacity: 0.22,
+    shadowRadius: 10
+  },
+  jumpToSearchText: {
+    color: "#ffffff",
+    fontSize: 15,
+    fontWeight: "900"
   },
   loadingState: {
     alignItems: "center",
