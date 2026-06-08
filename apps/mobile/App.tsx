@@ -129,6 +129,9 @@ export default function App() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedAudioIndex, setSelectedAudioIndex] = useState(0);
   const [playbackMessage, setPlaybackMessage] = useState("");
+  const [debugMode, setDebugMode] = useState(false);
+  const [simulateNetworkError, setSimulateNetworkError] = useState(false);
+  const [titleTapCount, setTitleTapCount] = useState(0);
 
   const entry = entries[0];
   const allPhonetics = useMemo(() => entries.flatMap((wordEntry) => wordEntry.phonetics ?? []), [entries]);
@@ -156,6 +159,25 @@ export default function App() {
     setPlaybackMessage("");
   }, [selectedAudioUrl]);
 
+  useEffect(() => {
+    // Reset tap count after 1 second
+    if (titleTapCount > 0) {
+      const timer = setTimeout(() => setTitleTapCount(0), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [titleTapCount]);
+
+  function handleTitlePress() {
+    const newCount = titleTapCount + 1;
+    setTitleTapCount(newCount);
+    
+    // Triple tap to toggle debug mode
+    if (newCount === 3) {
+      setDebugMode(!debugMode);
+      setTitleTapCount(0);
+    }
+  }
+
   async function searchWord(wordToSearch = searchTerm) {
     const cleanedWord = wordToSearch.trim();
 
@@ -175,6 +197,12 @@ export default function App() {
     try {
       audioPlayer.pause();
       await audioPlayer.seekTo(0).catch(() => undefined);
+      
+      // Simulate network error in debug mode
+      if (simulateNetworkError) {
+        throw new Error("Network error simulated");
+      }
+      
       const requestUrl = `${DICTIONARY_API_URL}/${encodeURIComponent(cleanedWord.toLowerCase())}`;
       const response = await axios.get<DictionaryEntry[]>(requestUrl);
       const nextEntries = Array.isArray(response.data) ? response.data : [];
@@ -356,10 +384,13 @@ export default function App() {
           <Pressable accessibilityRole="button" style={styles.iconButton} onPress={() => setIsDrawerOpen(true)}>
             <Ionicons name="menu" size={26} color="#475569" />
           </Pressable>
-          <View style={styles.brandBlock}>
+          <Pressable style={styles.brandBlock} onPress={handleTitlePress}>
             <Text style={styles.eyebrow}>LexiTech Dictionary</Text>
             <Text style={styles.title}>Dictionary</Text>
-          </View>
+            {debugMode && (
+              <Text style={styles.debugBadge}>🐛 DEBUG MODE</Text>
+            )}
+          </Pressable>
           {history.length ? (
             <View style={styles.historyBadge}>
               <Ionicons name="time-outline" size={18} color="#6366f1" />
@@ -373,6 +404,20 @@ export default function App() {
             <CardTitle>Find a Word</CardTitle>
           </CardHeader>
           <CardContent style={styles.searchForm}>
+            {debugMode && (
+              <Pressable
+                accessibilityRole="button"
+                style={styles.debugToggle}
+                onPress={() => setSimulateNetworkError(!simulateNetworkError)}
+              >
+                <View style={[styles.debugToggleTrack, simulateNetworkError && styles.debugToggleTrackActive]}>
+                  <View style={[styles.debugToggleThumb, simulateNetworkError && styles.debugToggleThumbActive]} />
+                </View>
+                <Text style={styles.debugToggleLabel}>
+                  Simulate Network Error {simulateNetworkError ? "ON" : "OFF"}
+                </Text>
+              </Pressable>
+            )}
             <Input
               autoCapitalize="none"
               autoCorrect={false}
@@ -956,5 +1001,55 @@ const styles = StyleSheet.create({
     backgroundColor: "#f8fafc",
     borderRadius: 12,
     padding: 20
+  },
+  debugBadge: {
+    color: "#f59e0b",
+    fontSize: 11,
+    fontWeight: "900",
+    marginTop: 4,
+    letterSpacing: 0.5
+  },
+  debugToggle: {
+    alignItems: "center",
+    backgroundColor: "#fef3c7",
+    borderColor: "#fbbf24",
+    borderWidth: 2,
+    borderRadius: 12,
+    flexDirection: "row",
+    gap: 12,
+    padding: 14
+  },
+  debugToggleTrack: {
+    backgroundColor: "#e5e7eb",
+    borderRadius: 12,
+    height: 28,
+    position: "relative",
+    width: 48
+  },
+  debugToggleTrackActive: {
+    backgroundColor: "#ef4444"
+  },
+  debugToggleThumb: {
+    backgroundColor: "#ffffff",
+    borderRadius: 10,
+    height: 24,
+    position: "absolute",
+    top: 2,
+    left: 2,
+    width: 24,
+    shadowColor: "#000",
+    shadowOffset: { height: 1, width: 0 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2
+  },
+  debugToggleThumbActive: {
+    left: 22
+  },
+  debugToggleLabel: {
+    color: "#92400e",
+    fontSize: 14,
+    fontWeight: "800",
+    flex: 1
   }
 });
